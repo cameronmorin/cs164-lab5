@@ -1,8 +1,36 @@
 import socket
-port = 5000
+import sys
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(("", port))
-print "waiting on port:", port
+HOST = ''
+PORT = 8888
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print 'Socket created'
+except socket.error, msg:
+    print 'Failed to create socket. Error code: ' + str(msg[0]) + ' Message ' + str(msg[1])
+    sys.exit()
+
+try:
+    s.bind((HOST, PORT))
+except socket.error, msg:
+    print 'Bind failed. Error code : ' + str(msg[0]) + ' Message ' + str(msg[1])
+    sys.exit()
+
+print 'Socket bind complete.'
+
 while 1:
-    data, addr = s.recvfrom(1024)
+    # receive data from the client (data, addr)
+    d = s.recvfrom(1024)
+    data = d[0]
+    addr = d[1]
+
+    if not data:
+        break
+    
+    reply = 'OK...' + data
+
+    s.sendto(reply, addr)
+    print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
+
+s.close()
