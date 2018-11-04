@@ -19,6 +19,8 @@ except socket.error, msg:
 
 print 'Socket bind complete.'
 
+currACK = 0
+
 while 1:
     # receive data from the client (data, addr)
     d = s.recvfrom(1024)
@@ -28,8 +30,13 @@ while 1:
     if not data:
         break
     
-    reply = 'OK...' + data
-
+    if currACK == 0:
+        reply = 'ACK0: OK...' + data
+        currACK = 1
+    else:
+        reply = 'ACK1: OK...' + data
+        currACK = 0
+        
     s.sendto(reply, addr)
     print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
 
